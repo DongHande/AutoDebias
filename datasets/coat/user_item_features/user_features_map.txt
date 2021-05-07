@@ -1,0 +1,14 @@
+gender:men
+gender:women
+age:20-30
+age:30-40
+age:40-50
+age:50-60
+age:over 60
+age:under 20
+location:rural
+location:suburban
+location:urban
+fashioninterest:moderately
+fashioninterest:not at all
+fashioninterest:very
