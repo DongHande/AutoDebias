@@ -29,12 +29,6 @@ def para(args):
         args.weight1_model_args = {'learning_rate': 0.01, 'weight_decay': 0.01}
         args.weight2_model_args = {'learning_rate': 1e-3, 'weight_decay': 1e-2}
         args.imputation_model_args = {'learning_rate': 1e-1, 'weight_decay': 1e-4}
-
-        # args.training_args = {'batch_size': 1024, 'epochs': 500, 'patience': 60, 'block_batch': [6000, 500]}
-        # args.base_model_args = {'emb_dim': 10, 'learning_rate': 1e-4, 'imputaion_lambda': 0.5, 'weight_decay': 1e-1}
-        # args.weight1_model_args = {'learning_rate': 1e-3, 'weight_decay': 0.0001} 
-        # args.weight2_model_args = {'learning_rate': 1e-3, 'weight_decay': 1e-3} 
-        # args.imputation_model_args = {'learning_rate': 10, 'weight_decay': 1e-4} 
     elif args.dataset == 'coat':
         args.training_args = {'batch_size': 128, 'epochs': 500, 'patience': 60, 'block_batch': [64, 64]}
         args.base_model_args = {'emb_dim': 10, 'learning_rate': 0.001, 'imputaion_lambda': 0.05, 'weight_decay': 1}
