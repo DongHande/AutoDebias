@@ -15,5 +15,5 @@ def parse_args():
     parser.add_argument('--training_args', type=dict, default = {'batch_size': 1024, 'epochs': 500, 'patience': 60, 'block_batch': [20, 500]}, 
                 help='training arguments.')
     parser.add_argument('--uniform_ratio', type=float, default=0.05, help='the ratio of uniform set in the unbiased dataset.')
-    parser.add_argument('--seed', type=int, default=3, help='global general random seed.')
+    parser.add_argument('--seed', type=int, default=0, help='global general random seed.')
     return parser.parse_args()
