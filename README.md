@@ -2,7 +2,7 @@
 
 This is the official pytorch implementation of AutoDebias, a debiasing method for recommendation system. AutoDebias is proposed in the paper:
 
-AutoDebias: Learning to Debias for Recommendation
+[AutoDebias: Learning to Debias for Recommendation](https://arxiv.org/abs/2105.04170)
 
 by  Jiawei Chen, Hande Dong, Yang Qiu, Xiangnan He, Xin Xin, Liang Chen, Guli Lin and Keping Yang
 
