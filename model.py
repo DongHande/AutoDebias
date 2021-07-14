@@ -6,6 +6,50 @@ from torch.autograd import Variable
 import itertools
 import math
 
+class MF(nn.Module):
+    """
+    Base module for matrix factorization.
+    """
+    def __init__(self, n_user, n_item, dim=40, dropout=0, init = None):
+        super().__init__()
+        
+        self.user_latent = nn.Embedding(n_user, dim)
+        self.item_latent = nn.Embedding(n_item, dim)
+        self.user_bias = nn.Embedding(n_user, 1)
+        self.item_bias = nn.Embedding(n_item, 1)
+        self.dropout_p = dropout
+        self.dropout = nn.Dropout(p=self.dropout_p)
+        if init is not None:
+            self.init_embedding(init)
+        else: 
+            self.init_embedding(0)
+        
+    def init_embedding(self, init): 
+        
+        nn.init.kaiming_normal_(self.user_latent.weight, mode='fan_out', a = init)
+        nn.init.kaiming_normal_(self.item_latent.weight, mode='fan_out', a = init)
+        nn.init.kaiming_normal_(self.user_bias.weight, mode='fan_out', a = init)
+        nn.init.kaiming_normal_(self.item_bias.weight, mode='fan_out', a = init)
+          
+    def forward(self, users, items):
+
+        u_latent = self.dropout(self.user_latent(users))
+        i_latent = self.dropout(self.item_latent(items))
+        u_bias = self.user_bias(users)
+        i_bias = self.item_bias(items)
+
+        preds = torch.sum(u_latent * i_latent, dim=1, keepdim=True)  + u_bias + i_bias
+        # preds = u_bias + i_bias
+
+        return preds.squeeze(dim=-1)
+
+    def l2_norm(self, users, items): 
+        users = torch.unique(users)
+        items = torch.unique(items)
+        
+        l2_loss = (torch.sum(self.user_latent(users)**2) + torch.sum(self.item_latent(items)**2)) / 2
+        return l2_loss
+
 def to_var(x, requires_grad=True):
     if torch.cuda.is_available():
         x = x.cuda()
@@ -136,8 +180,7 @@ class MetaMF(MetaModule):
         i_bias = self.item_bias.weight[items]
 
         preds = torch.sum(u_latent * i_latent, dim=1, keepdim=True) + u_bias + i_bias
-        preds = preds.squeeze(dim=-1)
-        return preds
+        return preds.squeeze(dim=-1)
 
     def l2_norm(self, users, items, unique = True): 
 
@@ -243,3 +286,34 @@ class FourLinear(nn.Module):
         preds = u_bias + i_bias + d_bias + p_bias
         return preds.squeeze()
 
+class Position(nn.Module): 
+    """
+    the position parameters for DLA
+    """
+    def __init__(self, n_position): 
+        super().__init__()
+        self.position_bias = nn.Embedding(n_position, 1)
+
+    def forward(self, positions): 
+        return self.position_bias(positions).squeeze(dim=-1)
+
+    def l2_norm(self, positions): 
+        positions = torch.unique(positions)
+        return torch.sum(self.position_bias(positions)**2)
+
+
+class MF_heckman(nn.Module): 
+    def __init__(self, n_user, n_item, dim=40, dropout=0, init = None):
+        super().__init__()
+        self.MF = MF(n_user, n_item, dim)
+        self.sigma = nn.Parameter(torch.randn(1))
+    
+    def forward(self, users, items, lams): 
+        pred_MF = self.MF(users, items)
+        pred = pred_MF - 1 * lams
+        return pred
+
+    def l2_norm(self, users, items): 
+        l2_loss_MF = self.MF.l2_norm(users, items)
+        l2_loss = l2_loss_MF + 1000 * torch.sum(self.sigma**2)
+        return l2_loss
