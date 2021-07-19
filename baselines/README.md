@@ -17,7 +17,7 @@ To run model MF(biased) on dataset Yahoo!R3 (supposing that the current director
 mv ./baselines/MF_bias.py . 
 ```
 ```
-python MF_bias.py --dataset Yahoo!R3
+python MF_bias.py --dataset yahooR3
 ```
 
 ## Correspondence between baseline methods and files 
